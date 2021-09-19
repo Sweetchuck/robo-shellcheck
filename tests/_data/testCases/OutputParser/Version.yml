@@ -1,0 +1,28 @@
+non-zero-exit-code:
+    exitCode: 1
+    stdOutput: |+
+        ShellCheck - shell script analysis tool
+        version: 0.7.2
+        license: GNU General Public License, version 3
+        website: https://www.shellcheck.net
+    stdError: |-
+        My error message 01
+    expected:
+        exitCode: 1
+        errorMessages:
+            - 'My error message 01'
+        assets: {}
+
+basic:
+    stdOutput: |+
+        ShellCheck - shell script analysis tool
+        version: 0.7.2
+        license: GNU General Public License, version 3
+        website: https://www.shellcheck.net
+
+    expected:
+        assets:
+            shellcheck.version.description: 'ShellCheck - shell script analysis tool'
+            shellcheck.version.version: '0.7.2'
+            shellcheck.version.license: 'GNU General Public License, version 3'
+            shellcheck.version.website: 'https://www.shellcheck.net'

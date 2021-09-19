@@ -1,0 +1,8 @@
+
+#namespace: 'Sweetchuck\Robo\Shellcheck\Tests\Unit'
+class_name: 'UnitActor'
+
+modules:
+    enabled:
+        - 'Asserts'
+        - '\Sweetchuck\Robo\Shellcheck\Tests\Helper\Unit'

@@ -1,0 +1,51 @@
+non-zero-exit-code:
+    exitCode: 1
+    stdOutput: |+
+        name:    add-default-case
+        desc:    Suggest adding a default case in `case` statements
+        example: case $? in 0) echo 'Success';; esac
+        fix:     case $? in 0) echo 'Success';; *) echo 'Fail' ;; esac
+    stdError: |-
+        My error message 01
+    expected:
+        exitCode: 1
+        errorMessages:
+            - 'My error message 01'
+        assets:
+            shellcheck.optional.rules: {}
+
+basic:
+    stdOutput: |+
+        name:    add-default-case
+        desc:    Suggest adding a default case in `case` statements
+        example: case $? in 0) echo 'Success';; esac
+        fix:     case $? in 0) echo 'Success';; *) echo 'Fail' ;; esac
+
+        name:    avoid-nullary-conditions
+        desc:    Suggest explicitly using -n in `[ $var ]`
+        example: [ "$var" ]
+        fix:     [ -n "$var" ]
+
+        name:    check-unassigned-uppercase
+        desc:    Warn when uppercase variables are unassigned
+        example: echo $VAR
+        fix:     VAR=hello; echo $VAR
+
+    expected:
+        assets:
+            shellcheck.optional.rules:
+                add-default-case:
+                    name:    'add-default-case'
+                    desc:    'Suggest adding a default case in `case` statements'
+                    example: "case $? in 0) echo 'Success';; esac"
+                    fix:     "case $? in 0) echo 'Success';; *) echo 'Fail' ;; esac"
+                avoid-nullary-conditions:
+                    name:    'avoid-nullary-conditions'
+                    desc:    'Suggest explicitly using -n in `[ $var ]`'
+                    example: '[ "$var" ]'
+                    fix:     '[ -n "$var" ]'
+                check-unassigned-uppercase:
+                    name:    'check-unassigned-uppercase'
+                    desc:    'Warn when uppercase variables are unassigned'
+                    example: 'echo $VAR'
+                    fix:     'VAR=hello; echo $VAR'

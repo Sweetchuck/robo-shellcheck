@@ -1,0 +1,159 @@
+
+version: 2.1
+
+orbs:
+    codecov: 'codecov/codecov@3.0.0'
+
+.env_app: &env_app
+    SHELL: '/bin/bash'
+
+.env_composer: &env_composer
+    COMPOSER_NO_INTERACTION: '1'
+    COMPOSER_MEMORY_LIMIT: '-1'
+    COMPOSER_DISABLE_XDEBUG_WARN: '1'
+
+.env_debian: &env_debian
+    DEBIAN_FRONTEND: 'noninteractive'
+
+executors:
+    php_min:
+        environment:
+            <<: *env_app
+            <<: *env_composer
+            <<: *env_debian
+        docker:
+            -
+                name: 'main'
+                image: 'circleci/php:7.4'
+    php_plus1:
+        environment:
+            <<: *env_app
+            <<: *env_composer
+            <<: *env_debian
+        docker:
+            -
+                name: 'main'
+                image: 'circleci/php:8.0'
+
+commands:
+    install_php_extension_pcov:
+        description: 'Install PCOV PHP extension'
+        steps:
+            -
+                run:
+                    name: 'Install PCOV PHP extension - pecl install pcov'
+                    command: 'sudo pecl install pcov'
+
+    install_shellcheck:
+        description: 'Install ShellCheck with APT'
+        steps:
+            -
+                run:
+                  name: 'Install ShellCheck with APT'
+                  command: |-
+                      sudo apt-get update \
+                      && \
+                      sudo apt-get -y install shellcheck
+
+    composer_install:
+        description: 'Install Composer dependencies with cache restore and save'
+        steps:
+            -
+                restore_cache:
+                    name: 'Composer - cache restore'
+                    keys:
+                        - 'composer-{{ checksum "./composer.lock" }}-2'
+
+            -
+                run:
+                    name: 'Composer - install'
+                    command: >
+                        composer install --no-progress --ansi
+
+            -
+                save_cache:
+                    name: 'Composer - cache save'
+                    key: 'composer-{{ checksum "./composer.lock" }}-2'
+                    paths:
+                        - '~/.composer/cache/'
+                        - '~/.cache/composer/'
+
+    lint:
+        description: 'Run linters'
+        steps:
+            -
+                run:
+                    name: 'Run linters'
+                    command: 'bin/robo  --ansi lint'
+
+    test:
+        description: 'Run tests'
+        steps:
+            -
+                run:
+                    name: 'Codeception - unit'
+                    command: 'bin/robo --ansi test unit'
+            -   codecov/upload:
+                    flags: 'unit'
+                    file: './tests/_output/machine/coverage/unit/coverage.xml'
+            -
+                run:
+                    name: 'Codeception - acceptance'
+                    command: 'bin/robo --ansi test acceptance'
+            -   codecov/upload:
+                    flags: 'unit'
+                    file: './tests/_output/machine/coverage/acceptance/coverage.xml'
+            -   store_test_results:
+                    name: 'Store unit test results'
+                    path: './tests/_output/machine/junit'
+
+jobs:
+    build:
+        executor: 'php_min'
+        working_directory: '~/repo'
+        steps:
+            - 'checkout'
+            - 'composer_install'
+    lint:
+        executor: 'php_min'
+        working_directory: '~/repo'
+        steps:
+            - 'checkout'
+            - 'composer_install'
+            - 'lint'
+    test_php_min:
+        executor: 'php_min'
+        working_directory: '~/repo'
+        steps:
+            - 'checkout'
+            - 'install_php_extension_pcov'
+            - 'install_shellcheck'
+            - 'composer_install'
+            - 'test'
+    test_php_plus1:
+        executor: 'php_plus1'
+        working_directory: '~/repo'
+        steps:
+            - 'checkout'
+            - 'install_php_extension_pcov'
+            - 'install_shellcheck'
+            - 'composer_install'
+            - 'test'
+
+workflows:
+    lint_and_test:
+        jobs:
+            -
+                build: {}
+            -
+                lint:
+                    requires:
+                        - 'build'
+            -
+                test_php_min:
+                    requires:
+                        - 'build'
+            -
+                test_php_plus1:
+                    requires:
+                        - 'build'

@@ -1,0 +1,9 @@
+
+#namespace: 'Sweetchuck\Robo\Shellcheck\Tests\Acceptance'
+class_name: 'AcceptanceActor'
+
+modules:
+    enabled:
+        - 'Asserts'
+        - '\Sweetchuck\Codeception\Module\RoboTaskRunner\RoboTaskRunner'
+        - '\Sweetchuck\Robo\Shellcheck\Tests\Helper\Acceptance'
