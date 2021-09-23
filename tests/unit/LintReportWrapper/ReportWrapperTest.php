@@ -7,6 +7,7 @@ namespace Sweetchuck\Robo\Shellcheck\Tests\Unit\LintReportWrapper;
 use Codeception\Test\Unit;
 use Sweetchuck\LintReport\ReportWrapperInterface;
 use Sweetchuck\Robo\Shellcheck\LintReportWrapper\ReportWrapper;
+use Sweetchuck\Robo\Shellcheck\ResultConverter\JsonToReport;
 use Sweetchuck\Robo\Shellcheck\Tests\UnitActor;
 
 /**
@@ -91,5 +92,55 @@ class ReportWrapperTest extends Unit
             $this->tester->assertSame($expectedFile['errors'], $file->numOfErrors());
             $this->tester->assertSame($expectedFile['warnings'], $file->numOfWarnings());
         }
+    }
+
+    public function casesHighestSeverity(): array
+    {
+        return [
+            'empty' => ['ok', []],
+            'warning' => [
+                'warning',
+                [
+                    [
+                        'file' => 'a.bash',
+                        'level' => 'warning',
+                        'code' => 42,
+                        'severity' => 42,
+                        'fix' => null,
+                    ],
+                ],
+            ],
+            'error' => [
+                'error',
+                [
+                    [
+                        'file' => 'a.bash',
+                        'level' => 'warning',
+                        'code' => 42,
+                        'severity' => 42,
+                        'fix' => null,
+                    ],
+                    [
+                        'file' => 'a.bash',
+                        'level' => 'error',
+                        'code' => 42,
+                        'severity' => 42,
+                        'fix' => null,
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider casesHighestSeverity
+     */
+    public function testHighestSeverity(string $expected, array $result)
+    {
+        $reportData = (new JsonToReport())->convertFromArray($result);
+        $this->tester->assertSame(
+            $expected,
+            (new ReportWrapper($reportData))->highestSeverity(),
+        );
     }
 }

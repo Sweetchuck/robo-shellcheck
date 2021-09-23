@@ -7,9 +7,13 @@ namespace Sweetchuck\Robo\Shellcheck\ResultConverter;
 class JsonToReport
 {
 
-    public function convert(string $stdOutput): array
+    public function convertFromJson(string $stdOutput): array
     {
-        $failures = json_decode($stdOutput, true);
+        return $this->convertFromArray(json_decode($stdOutput, true));
+    }
+
+    public function convertFromArray(array $failures): array
+    {
         $report = [
             'files' => [],
             'errors' => 0,

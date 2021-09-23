@@ -124,7 +124,7 @@ class JsonToReportTest extends Unit
 
         $this->tester->assertSame(
             $expected,
-            $converter->convert($json),
+            $converter->convertFromJson($json),
         );
     }
 }

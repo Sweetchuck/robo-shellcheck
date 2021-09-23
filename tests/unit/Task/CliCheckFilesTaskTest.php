@@ -132,7 +132,7 @@ class CliCheckFilesTaskTest extends TaskTestBase
                 'fix' => null,
             ]
         ];
-        $reportData = (new JsonToReport())->convert(json_encode($jsonResult));
+        $reportData = (new JsonToReport())->convertFromJson(json_encode($jsonResult));
 
         $expected = [
             'exitCode' => 1,

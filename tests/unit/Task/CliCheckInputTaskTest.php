@@ -146,7 +146,7 @@ class CliCheckInputTaskTest extends TaskTestBase
                 ],
             ],
         ];
-        $reportData = (new JsonToReport())->convert(json_encode(array_merge(
+        $reportData = (new JsonToReport())->convertFromJson(json_encode(array_merge(
             $jsonResults['a.bash'],
             $jsonResults['b.bash'],
         )));

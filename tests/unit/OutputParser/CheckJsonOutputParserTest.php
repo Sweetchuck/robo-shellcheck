@@ -39,7 +39,7 @@ class CheckJsonOutputParserTest extends TestBase
                     'exitCode' => 0,
                     'errorMessages' => [],
                     'assets' => [
-                        'shellcheck.check.report' => new ReportWrapper($converter->convert('[]')),
+                        'shellcheck.check.report' => new ReportWrapper($converter->convertFromJson('[]')),
                     ],
                 ],
                 'exitCode' => 0,

@@ -34,7 +34,7 @@ class CheckJsonOutputParser extends OutputParserBase
         }
 
         $key = $this->getExternalAssetName('report');
-        $reportData = $this->converter->convert($stdOutput);
+        $reportData = $this->converter->convertFromJson($stdOutput);
         $return['assets'][$key] = new ReportWrapper($reportData);
 
         return $return;
